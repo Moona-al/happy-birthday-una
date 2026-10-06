@@ -1,26 +1,4619 @@
 @import "tailwindcss";
 
+/* ============================================================
+   BIRTHDAY DESIGN SYSTEM
+   Editorial · Romantic · Minimal · Cinematic
+   ============================================================ */
+
+/* ─── Color tokens (defaults, overridden via JS) ──────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bd-bg: #F8F5F0;
+  --bd-primary: #171515;
+  --bd-secondary: #6F6760;
+  --bd-accent: #D98C9B;
+  --bd-soft-accent: #F0D7DC;
+  --bd-white: #FFFFFF;
+
+  /* Spacing */
+  --bd-section-py: clamp(5rem, 12vw, 10rem);
+  --bd-max-w: 1200px;
+  --bd-content-w: 800px;
+
+  /* Typography */
+  --font-serif: var(--font-cormorant), "Georgia", serif;
+  --font-sans: var(--font-inter), "Helvetica Neue", sans-serif;
+
+  /* Transitions */
+  --bd-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --bd-ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ─── Reset & Base ────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bd-bg);
+  color: var(--bd-primary);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+/* ─── Grain texture ───────────────────────────────────────── */
+.bd-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}
+
+/* ─── Reveal animation base ───────────────────────────────── */
+.bd-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.9s var(--bd-ease), transform 0.9s var(--bd-ease);
+}
+
+.bd-reveal--in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .bd-reveal {
+    transition: opacity 0.3s ease;
+    transform: none;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.1s !important;
+  }
+}
+
+/* ─── Eyebrow text ────────────────────────────────────────── */
+.bd-eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--bd-secondary);
+  display: block;
+  margin-bottom: 1.5rem;
+}
+
+/* ─── Section base ────────────────────────────────────────── */
+.bd-section {
+  padding: var(--bd-section-py) clamp(1.5rem, 5vw, 6rem);
+}
+
+/* ============================================================
+   SCROLL PROGRESS
+   ============================================================ */
+.bd-scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background: transparent;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.bd-scroll-progress__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--bd-accent);
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform 0.1s linear;
+}
+
+/* ============================================================
+   INTRO SCREEN
+   ============================================================ */
+.bd-intro {
+  position: fixed;
+  inset: 0;
+  background: var(--bd-bg);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.8s var(--bd-ease);
+}
+
+.bd-intro--visible {
+  opacity: 1;
+}
+
+.bd-intro--exiting {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bd-intro__content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.bd-intro__eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--bd-accent);
+}
+
+.bd-intro__text {
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--bd-primary);
+  line-height: 1.3;
+  max-width: 28ch;
+}
+
+.bd-intro__btn {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--bd-secondary);
+  padding: 0;
+  border-bottom: 1px solid var(--bd-accent);
+  padding-bottom: 4px;
+  transition: color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.bd-intro__btn:hover,
+.bd-intro__btn:focus-visible {
+  color: var(--bd-primary);
+  border-color: var(--bd-primary);
+  transform: translateX(4px);
+  outline: none;
+}
+
+.bd-intro__btn:focus-visible {
+  outline: 2px solid var(--bd-accent);
+  outline-offset: 6px;
+}
+
+/* ─── Decorative corners ──────────────────────────────────── */
+.bd-corner {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+}
+
+.bd-corner--tl { top: 2rem; left: 2rem; border-top: 1px solid var(--bd-accent); border-left: 1px solid var(--bd-accent); }
+.bd-corner--tr { top: 2rem; right: 2rem; border-top: 1px solid var(--bd-accent); border-right: 1px solid var(--bd-accent); }
+.bd-corner--bl { bottom: 2rem; left: 2rem; border-bottom: 1px solid var(--bd-accent); border-left: 1px solid var(--bd-accent); }
+.bd-corner--br { bottom: 2rem; right: 2rem; border-bottom: 1px solid var(--bd-accent); border-right: 1px solid var(--bd-accent); }
+
+/* ─── Floating particles ──────────────────────────────────── */
+.bd-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.bd-particle {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  background: var(--bd-accent);
+  opacity: 0;
+  animation: bd-float 8s ease-in-out infinite;
+}
+
+/* Generate different sizes and positions for 12 particles */
+.bd-particle--1  { width: 4px; height: 4px; left: 15%; top: 20%; animation-delay: 0s;    animation-duration: 7s;  opacity: 0.2; }
+.bd-particle--2  { width: 3px; height: 3px; left: 80%; top: 15%; animation-delay: 1s;    animation-duration: 9s;  opacity: 0.15; }
+.bd-particle--3  { width: 5px; height: 5px; left: 25%; top: 75%; animation-delay: 2s;    animation-duration: 8s;  opacity: 0.12; }
+.bd-particle--4  { width: 2px; height: 2px; left: 70%; top: 80%; animation-delay: 0.5s;  animation-duration: 11s; opacity: 0.2; }
+.bd-particle--5  { width: 4px; height: 4px; left: 50%; top: 10%; animation-delay: 3s;    animation-duration: 7s;  opacity: 0.15; }
+.bd-particle--6  { width: 3px; height: 3px; left: 90%; top: 50%; animation-delay: 1.5s;  animation-duration: 10s; opacity: 0.1; }
+.bd-particle--7  { width: 2px; height: 2px; left: 10%; top: 60%; animation-delay: 4s;    animation-duration: 9s;  opacity: 0.18; }
+.bd-particle--8  { width: 4px; height: 4px; left: 40%; top: 88%; animation-delay: 2.5s;  animation-duration: 8s;  opacity: 0.12; }
+.bd-particle--9  { width: 3px; height: 3px; left: 60%; top: 35%; animation-delay: 0.8s;  animation-duration: 12s; opacity: 0.15; }
+.bd-particle--10 { width: 2px; height: 2px; left: 35%; top: 5%;  animation-delay: 3.5s;  animation-duration: 7s;  opacity: 0.2; }
+.bd-particle--11 { width: 5px; height: 5px; left: 85%; top: 70%; animation-delay: 2s;    animation-duration: 9s;  opacity: 0.1; }
+.bd-particle--12 { width: 3px; height: 3px; left: 5%;  top: 40%; animation-delay: 1s;    animation-duration: 11s; opacity: 0.15; }
+
+@keyframes bd-float {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0; }
+  20%       { opacity: 1; }
+  80%       { opacity: 1; }
+  50%       { transform: translateY(-20px) scale(1.1); }
+}
+
+/* ============================================================
+   MAIN WRAPPER
+   ============================================================ */
+.bd-main {
+  opacity: 0;
+  transition: opacity 0.8s var(--bd-ease) 0.3s;
+  min-height: 100vh;
+}
+
+.bd-main--visible {
+  opacity: 1;
+}
+
+/* ============================================================
+   HERO SECTION
+   ============================================================ */
+.bd-hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bd-bg);
+  overflow: hidden;
+  padding: clamp(4rem, 10vw, 8rem) clamp(1.5rem, 5vw, 6rem);
+}
+
+.bd-hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bd-bg);
+  overflow: hidden;
+  padding: clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 4rem);
+}
+
+.bd-hero--garden {
+  position: relative;
+}
+
+.bd-hero__inner {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  width: 100%;
+  max-width: 840px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(1.5rem, 3vw, 2.5rem) 0;
+}
+
+/* Soft ambient scrim behind text for 100% typography contrast */
+.bd-hero__text-scrim {
+  position: absolute;
+  inset: -20px -30px;
+  border-radius: 9999px;
+  background: radial-gradient(ellipse at center, rgba(248, 245, 240, 0.88) 0%, rgba(248, 245, 240, 0.55) 60%, rgba(248, 245, 240, 0) 85%);
+  filter: blur(14px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Text group — Always prominent & clearly readable as the garden's focal point */
+.bd-hero__text {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 1.2s ease;
+  will-change: opacity, transform, filter;
+}
+
+.bd-hero__text--revealed-no {
+  opacity: 0;
+  transform: translateY(22px);
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+.bd-hero__text--revealed-yes {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+  pointer-events: auto;
+}
+
+.bd-hero__eyebrow-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.bd-hero__sparkle {
+  color: var(--bd-accent);
+  font-size: 0.75rem;
+  opacity: 0.8;
+  animation: bd-sparkle-pulse 2.8s ease-in-out infinite;
+}
+
+.bd-hero__eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--bd-secondary);
+}
+
+/* Hero title — "HAPPY BIRTHDAY" — the largest, most prominent focal element */
+.bd-hero__title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.8rem, 8vw, 6.2rem);
+  font-weight: 300;
+  line-height: 0.96;
+  color: var(--bd-primary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 1.15rem;
+}
+
+.bd-hero__title-line {
+  display: block;
+}
+
+.bd-hero__title-top {
+  letter-spacing: 0.08em;
+}
+
+.bd-hero__title-bottom {
+  letter-spacing: 0.05em;
+}
+
+/* Hero name — intimate, italic, accent color */
+.bd-hero__name {
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--bd-accent);
+  letter-spacing: 0.02em;
+  margin-bottom: 1.1rem;
+}
+
+/* Hero subtitle */
+.bd-hero__subtitle {
+  font-family: var(--font-sans);
+  font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: lowercase;
+  color: var(--bd-secondary);
+  opacity: 0.75;
+  margin-bottom: 1.75rem;
+}
+
+/* Decorative ornament */
+.bd-hero__deco {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+.bd-hero__deco-flower {
+  font-size: 0.85rem;
+  line-height: 1;
+  display: inline-block;
+  animation: bd-flower-float 3.5s ease-in-out infinite;
+}
+
+.bd-hero__deco-line {
+  display: block;
+  width: 48px;
+  height: 1px;
+  background: var(--bd-accent);
+  opacity: 0.5;
+}
+
+.bd-hero__deco-dot {
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--bd-accent);
+}
+
+/* ─── Hero actions & Replay bloom button ─── */
+.bd-hero__actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.bd-replay-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1.15rem;
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bd-secondary);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(217, 140, 155, 0.28);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+}
+
+.bd-replay-btn:hover {
+  color: var(--bd-primary);
+  background: rgba(255, 255, 255, 0.9);
+  border-color: var(--bd-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(217, 140, 155, 0.22);
+}
+
+.bd-replay-btn:active {
+  transform: translateY(0);
+}
+
+.bd-replay-icon {
+  width: 13px;
+  height: 13px;
+  transition: transform 0.4s ease;
+}
+
+.bd-replay-btn:hover .bd-replay-icon {
+  transform: rotate(60deg);
+}
+
+.bd-replay-btn--active .bd-replay-icon {
+  animation: bd-spin 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes bd-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes bd-sparkle-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
+  50%      { opacity: 1;    transform: scale(1.2); }
+}
+
+@keyframes bd-flower-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-4px) rotate(6deg); }
+}
+
+/* Scroll indicator */
+.bd-scroll-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bd-scroll-indicator__line {
+  display: block;
+  width: 1px;
+  height: 2.5rem;
+  background: var(--bd-secondary);
+  opacity: 0.3;
+  animation: bd-scroll-pulse 2s ease-in-out infinite;
+}
+
+.bd-scroll-indicator__label {
+  font-family: var(--font-sans);
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--bd-secondary);
+  opacity: 0.4;
+}
+
+@keyframes bd-scroll-pulse {
+  0%, 100% { opacity: 0.15; transform: scaleY(1); }
+  50%       { opacity: 0.4;  transform: scaleY(1.1); }
+}
+
+/* ============================================================
+   COUNTDOWN SECTION
+   ============================================================ */
+.bd-countdown {
+  background: var(--bd-primary);
+  color: var(--bd-white);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.bd-countdown::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(217, 140, 155, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.bd-countdown__inner {
+  max-width: var(--bd-content-w);
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.bd-countdown .bd-eyebrow {
+  color: var(--bd-accent);
+  opacity: 0.7;
+}
+
+.bd-countdown__grid {
+  display: flex;
+  gap: clamp(2rem, 6vw, 5rem);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+}
+
+.bd-countdown__unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bd-countdown__number {
+  font-family: var(--font-serif);
+  font-size: clamp(3.5rem, 10vw, 7rem);
+  font-weight: 300;
+  line-height: 1;
+  color: var(--bd-white);
+  letter-spacing: -0.02em;
+}
+
+.bd-countdown__label {
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--bd-secondary);
+}
+
+.bd-countdown__today {
+  padding: 3rem 0;
+}
+
+.bd-countdown__today-text {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 6vw, 4rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--bd-white);
+  margin-bottom: 1rem;
+}
+
+.bd-countdown__today-name {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--bd-accent);
+}
+
+.bd-countdown__loading {
+  padding: 4rem 0;
+  color: transparent;
+  font-size: 4rem;
+}
+
+.bd-countdown__date {
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  color: var(--bd-secondary);
+  opacity: 0.5;
+  margin-top: 1rem;
+}
+
+/* ============================================================
+   PAGE 03: MEMORIES — MEMORY WALL OF WARM FAIRY LIGHTS
+   Polaroid photos hanging on organic twine with glowing fairy bulbs
+   Nostalgic bedroom scrapbook atmosphere · Intimate tactility
+   ============================================================ */
+.bd-memories {
+  background: var(--bd-bg);
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+.bd-memories--memory-wall,
+.bd-memories--polaroid-wall {
+  padding: clamp(4.5rem, 8vw, 7.5rem) clamp(1rem, 4vw, 3.5rem);
+}
+
+.bd-memories__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* ─── Ambient Bedroom Dust Particles (3-6 slow floating motes) ─── */
+.bd-memories__dust-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.bd-memories__dust-particle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 230, 180, 0.55) 0%, rgba(255, 204, 128, 0) 70%);
+  filter: blur(0.5px);
+  opacity: 0.6;
+  animation: bd-dust-float linear infinite alternate;
+  will-change: transform, opacity;
+}
+
+@keyframes bd-dust-float {
+  0% {
+    transform: translate(0, 0) scale(0.9);
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate(18px, -35px) scale(1.15);
+    opacity: 0.4;
+  }
+}
+
+/* ─── Section Transition Copy ─── */
+.bd-memories__transition {
+  text-align: center;
+  margin-bottom: clamp(2rem, 4.5vw, 3.5rem);
+}
+
+.bd-memories__transition-line {
+  font-family: var(--font-serif);
+  font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+  font-style: italic;
+  font-weight: 300;
+  color: var(--bd-secondary);
+  line-height: 1.6;
+  opacity: 0.82;
+}
+
+/* ─── Section Heading ─── */
+.bd-memories__header {
+  text-align: center;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bd-memories__heading {
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 300;
+  line-height: 1.12;
+  color: var(--bd-primary);
+  letter-spacing: 0.04em;
+  text-transform: capitalize;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.bd-memories__heading-line {
+  display: block;
+}
+
+.bd-memories__subtitle {
+  font-family: var(--font-sans);
+  font-size: clamp(0.78rem, 1.4vw, 0.92rem);
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  color: var(--bd-secondary);
+  opacity: 0.78;
+  max-width: 36ch;
+  line-height: 1.65;
+}
+
+/* ─── Scrapbook Accents: Floating Handwritten Notes ─── */
+.bd-memories__scrap-accents {
+  display: flex;
+  justify-content: space-between;
+  max-width: 960px;
+  margin: 0 auto clamp(1.5rem, 3vw, 2.5rem);
+  padding: 0 1rem;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.bd-memories__scrap-note {
+  font-family: var(--font-handwriting), "Caveat", "Dancing Script", cursive, var(--font-serif);
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  color: var(--bd-accent);
+  transform: rotate(-3deg);
+  letter-spacing: 0.04em;
+}
+
+.bd-memories__scrap-date {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--bd-secondary);
+  opacity: 0.7;
+}
+
+/* ============================================================
+   MEMORY STRING & FAIRY LIGHT SYSTEM
+   ============================================================ */
+.bd-memory-string {
+  position: relative;
+  width: 100%;
+}
+
+/* SVG Rope path that draws from left to right */
+.bd-memory-string__svg {
+  width: 100%;
+  height: 90px;
+  overflow: visible;
+  display: block;
+  pointer-events: none;
+}
+
+.bd-memory-string__rope-path {
+  transition: stroke-dashoffset 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: stroke-dashoffset;
+}
+
+/* Light bulbs & photos layered on the string */
+.bd-memory-string__lights-layer,
+.bd-memory-string__photos-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bd-memory-string__photos-layer {
+  pointer-events: auto;
+}
+
+.bd-memory-string__light-node {
+  position: absolute;
+  transform: translate(-50%, -6px);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.bd-memory-string__photo-node {
+  position: absolute;
+  transform: translate(-50%, 0);
+  z-index: 10;
+}
+
+/* ─── Fairy Light Bulb (StringLight) ─── */
+.bd-string-light {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.4s ease var(--turn-on-delay, 0s),
+              transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) var(--turn-on-delay, 0s);
+  will-change: opacity, transform, filter;
+}
+
+.bd-string-light--off {
+  opacity: 0.42;
+  transform: scale(0.9);
+  filter: none;
+}
+
+.bd-string-light--on {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Little dark fixture socket hanging from string */
+.bd-string-light__cap {
+  width: 5px;
+  height: 4px;
+  background: #615951;
+  border-radius: 1px 1px 0 0;
+  margin-bottom: -1px;
+}
+
+/* Glass Bulb and warm halo */
+.bd-string-light__bulb-svg {
+  width: 15px;
+  height: 20px;
+  overflow: visible;
+}
+
+.bd-string-light--on .bd-string-light__bulb-svg {
+  filter: drop-shadow(0 0 6px rgba(255, 198, 92, 0.72))
+          drop-shadow(0 0 14px rgba(255, 160, 48, 0.4));
+}
+
+.bd-string-light__halo {
+  opacity: 0;
+  transition: opacity 0.4s ease var(--turn-on-delay, 0s);
+}
+
+.bd-string-light--on .bd-string-light__halo {
+  opacity: 0.88;
+  animation: bd-fairy-breathe var(--idle-dur, 4.2s) ease-in-out infinite alternate var(--idle-delay, 0s);
+}
+
+.bd-string-light__spark {
+  opacity: 0;
+  transition: opacity 0.3s ease var(--turn-on-delay, 0s);
+}
+
+.bd-string-light--on .bd-string-light__spark {
+  opacity: 1;
+  animation: bd-fairy-sparkle var(--idle-dur, 4.2s) ease-in-out infinite alternate var(--idle-delay, 0s);
+}
+
+/* Subtle, organic warm fairy flicker / breathing */
+@keyframes bd-fairy-breathe {
+  0% {
+    opacity: 0.78;
+    transform: scale(0.95);
+    transform-origin: 8px 13px;
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1.04);
+    transform-origin: 8px 13px;
+  }
+  75% {
+    opacity: 0.86;
+    transform: scale(0.98);
+    transform-origin: 8px 13px;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.02);
+    transform-origin: 8px 13px;
+  }
+}
+
+@keyframes bd-fairy-sparkle {
+  0% { opacity: 0.85; }
+  50% { opacity: 1; }
+  85% { opacity: 0.9; }
+  100% { opacity: 1; }
+}
+
+/* ============================================================
+   WOODEN CLOTHESPIN CLIP (MemoryClip)
+   ============================================================ */
+.bd-memory-clip {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -10px);
+  z-index: 15;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.14));
+}
+
+.bd-memory-clip__svg {
+  width: 14px;
+  height: 28px;
+  display: block;
+}
+
+/* ============================================================
+   POLAROID ANCHOR & CARD STYLING
+   ============================================================ */
+.bd-polaroid-anchor {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(-60px) scale(0.9) rotate(calc(var(--target-rot, 0deg) - 5deg));
+  will-change: transform, opacity;
+}
+
+/* Drop entrance animation: drops, slight overshoot, settles into place */
+.bd-polaroid-anchor--dropped {
+  animation: bd-polaroid-spring-drop 1.2s cubic-bezier(0.2, 0.88, 0.32, 1) forwards;
+}
+
+@keyframes bd-polaroid-spring-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-60px) scale(0.9) rotate(calc(var(--target-rot, 0deg) - 5deg));
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(6px) scale(1.01) rotate(calc(var(--target-rot, 0deg) * 1.08));
+  }
+  85% {
+    transform: translateY(-2px) scale(0.995) rotate(calc(var(--target-rot, 0deg) * 0.96));
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(var(--target-rot, 0deg));
+  }
+}
+
+/* Vertical twine connecting rope to clip */
+.bd-polaroid__twine {
+  width: 1px;
+  height: var(--hanger-len, 32px);
+  background: linear-gradient(180deg, #B5A99C 0%, #A89C8E 100%);
+  margin: 0 auto;
+}
+
+/* Clip sits at bottom of twine, grasping top edge of polaroid */
+.bd-polaroid__clip-mount {
+  top: var(--hanger-len, 32px);
+  transform: translate(-50%, -12px);
+}
+
+/* ─── Polaroid Card Container (Swaying & Tactile) ─── */
+.bd-polaroid {
+  position: relative;
+  width: clamp(230px, 24vw, 280px);
+  background: #FAF8F4;
+  padding: 12px 12px 18px 12px;
+  border-radius: 2px;
+  box-shadow:
+    0 2px 5px rgba(23, 21, 21, 0.04),
+    0 8px 24px rgba(23, 21, 21, 0.08),
+    0 20px 48px rgba(23, 21, 21, 0.05);
+  border: 1px solid rgba(23, 21, 21, 0.06);
+  user-select: none;
+  cursor: pointer;
+  outline: none;
+  transform-origin: top center;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, box-shadow;
+}
+
+/* Continuous ambient breeze sway (as if from room fan / gentle draft) */
+.bd-polaroid-anchor--dropped .bd-polaroid--sway {
+  animation: bd-polaroid-gentle-sway var(--sway-dur, 8.5s) ease-in-out infinite alternate var(--sway-delay, 0s);
+}
+
+@keyframes bd-polaroid-gentle-sway {
+  0% {
+    transform: rotate(0deg) translateY(0);
+  }
+  50% {
+    transform: rotate(0.6deg) translateY(-2px);
+  }
+  100% {
+    transform: rotate(-0.5deg) translateY(1px);
+  }
+}
+
+/* Hover: subtle lift, straighten slightly, elevated shadow */
+.bd-polaroid:hover {
+  transform: scale(1.04) rotate(var(--hover-rot, 0deg)) translateY(-6px) !important;
+  z-index: 30;
+  box-shadow:
+    0 4px 8px rgba(23, 21, 21, 0.06),
+    0 16px 36px rgba(23, 21, 21, 0.12),
+    0 32px 64px rgba(23, 21, 21, 0.09);
+}
+
+.bd-polaroid:focus-visible {
+  outline: 2px solid var(--bd-accent);
+  outline-offset: 4px;
+}
+
+/* Micro-interaction on click: NO LIGHTBOX, just tactile tilt & wiggle bounce */
+.bd-polaroid--wiggling {
+  animation: bd-polaroid-wiggle 0.55s ease-in-out forwards !important;
+}
+
+@keyframes bd-polaroid-wiggle {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(0.98) rotate(-3.5deg);
+  }
+  55% {
+    transform: scale(1.03) rotate(2.8deg);
+  }
+  80% {
+    transform: scale(0.99) rotate(-1deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Photo Window */
+.bd-polaroid__photo-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #E8E2D9;
+  border-radius: 1px;
+}
+
+.bd-polaroid__photo {
+  object-fit: cover;
+  transition: transform 0.6s var(--bd-ease);
+}
+
+.bd-polaroid:hover .bd-polaroid__photo {
+  transform: scale(1.03);
+}
+
+.bd-polaroid__photo-glare {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0) 50%,
+    rgba(0, 0, 0, 0.04) 100%
+  );
+  pointer-events: none;
+}
+
+/* Clean Polaroid Chin */
+.bd-polaroid__footer {
+  height: 26px;
+}
+
+.bd-polaroid__caption {
+  font-family: var(--font-handwriting), "Caveat", "Dancing Script", cursive, var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #2D2727;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.bd-polaroid__date {
+  font-family: var(--font-sans);
+  font-size: 0.58rem;
+  letter-spacing: 0.22em;
+  color: var(--bd-secondary);
+  opacity: 0.65;
+  margin-top: 2px;
+}
+
+.bd-polaroid__stamp {
+  position: absolute;
+  bottom: 12px;
+  right: 14px;
+  font-size: 0.65rem;
+  color: var(--bd-accent);
+  opacity: 0.45;
+}
+
+/* Washi Tape Accent */
+.bd-polaroid__tape {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-1.5deg);
+  width: 54px;
+  height: 18px;
+  background: rgba(240, 215, 220, 0.68);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  z-index: 5;
+  pointer-events: none;
+}
+
+.bd-polaroid__tape--2 {
+  transform: translateX(-50%) rotate(2.5deg);
+  background: rgba(235, 225, 210, 0.72);
+}
+
+.bd-polaroid__tape--3 {
+  transform: translateX(-50%) rotate(-3deg);
+  background: rgba(220, 230, 220, 0.65);
+}
+
+/* ============================================================
+   RESPONSIVE LAYOUTS: DESKTOP (2 TIERS) & MOBILE (SEGMENTS)
+   ============================================================ */
+.bd-memory-wall--desktop {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4rem, 8vw, 7rem);
+  width: 100%;
+  position: relative;
+  margin: 1.5rem 0 3rem 0;
+}
+
+.bd-memory-wall__tier {
+  position: relative;
+  width: 100%;
+  min-height: 380px;
+}
+
+/* Mobile is hidden on desktop */
+.bd-memory-wall--mobile {
+  display: none;
+}
+
+/* Scrapbook Footer Hint */
+.bd-memories__footer-hint {
+  text-align: center;
+  margin-top: clamp(3rem, 6vw, 4.5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.bd-memories__hint-icon {
+  color: var(--bd-accent);
+  font-size: 0.85rem;
+}
+
+.bd-memories__hint-text {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--bd-secondary);
+  opacity: 0.6;
+}
+
+/* ─── Fade Up Reveal Utility ─── */
+.bd-fade-up {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bd-fade-up--in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================================
+   MOBILE COMPOSITION (< 768px)
+   Vertical / Zig-zag rope segments with max width min(78vw, 320px)
+   ============================================================ */
+@media (max-width: 768px) {
+  .bd-memory-wall--desktop {
+    display: none;
+  }
+
+  .bd-memory-wall--mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 3.5rem;
+    width: 100%;
+    margin: 1rem 0 2rem 0;
+  }
+
+  .bd-memory-wall__mobile-segment {
+    position: relative;
+    width: 100%;
+    min-height: 380px;
+    overflow: visible;
+  }
+
+  .bd-polaroid {
+    width: min(78vw, 320px);
+  }
+
+  .bd-memories__scrap-accents {
+    display: none;
+  }
+}
+
+/* ─── Reduced Motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  .bd-polaroid-anchor,
+  .bd-polaroid,
+  .bd-fade-up,
+  .bd-memories__dust-particle,
+  .bd-string-light,
+  .bd-string-light__halo,
+  .bd-string-light__spark,
+  .bd-memory-string__rope-path {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+}
+
+/* ============================================================
+   PERSONAL MESSAGE SECTION
+   ============================================================ */
+.bd-message {
+  background: var(--bd-soft-accent);
+  position: relative;
+  overflow: hidden;
+}
+
+.bd-message::before {
+  content: '';
+  position: absolute;
+  top: -4rem;
+  left: 0;
+  right: 0;
+  height: 8rem;
+  background: var(--bd-bg);
+  clip-path: ellipse(60% 100% at 50% 0%);
+}
+
+.bd-message__inner {
+  max-width: var(--bd-content-w);
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.bd-message__dear {
+  font-family: var(--font-serif);
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--bd-primary);
+  margin-bottom: 2.5rem;
+  transition-delay: 0.15s;
+}
+
+.bd-message__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  margin-bottom: 3rem;
+  transition-delay: 0.3s;
+}
+
+.bd-message__para {
+  font-family: var(--font-serif);
+  font-size: clamp(1.3rem, 3.5vw, 1.9rem);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--bd-primary);
+  white-space: pre-line;
+}
+
+.bd-message__signature {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition-delay: 0.5s;
+}
+
+.bd-message__sig-line {
+  display: block;
+  width: 3rem;
+  height: 1px;
+  background: var(--bd-accent);
+}
+
+.bd-message__sig-text {
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--bd-secondary);
+}
+
+/* ============================================================
+   GIFT SECTION
+   ============================================================ */
+.bd-gift {
+  background: var(--bd-bg);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.bd-gift__inner {
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.bd-gift__box-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  transition-delay: 0.15s;
+  margin-bottom: 2rem;
+}
+
+.bd-gift__box {
+  position: relative;
+  width: 100px;
+  height: 90px;
+  cursor: pointer;
+  transition: transform 0.4s var(--bd-ease);
+}
+
+.bd-gift__box:hover:not(.bd-gift__box--opened) {
+  transform: translateY(-4px);
+}
+
+.bd-gift__box:focus-visible {
+  outline: 2px solid var(--bd-accent);
+  outline-offset: 8px;
+  border-radius: 4px;
+}
+
+.bd-gift__lid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 28px;
+  background: var(--bd-accent);
+  border-radius: 4px 4px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.6s var(--bd-ease), opacity 0.6s ease;
+  transform-origin: top center;
+  z-index: 2;
+}
+
+.bd-gift__box--opened .bd-gift__lid {
+  transform: translateY(-40px) rotate(-15deg);
+  opacity: 0;
+}
+
+.bd-gift__ribbon-h {
+  width: 70%;
+  height: 2px;
+  background: var(--bd-white);
+  opacity: 0.6;
+}
+
+.bd-gift__body {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 65px;
+  background: var(--bd-soft-accent);
+  border: 1.5px solid var(--bd-accent);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.4s var(--bd-ease);
+}
+
+.bd-gift__box--opened .bd-gift__body {
+  transform: scale(1.05);
+}
+
+.bd-gift__ribbon-v {
+  position: absolute;
+  inset: 0;
+  width: 2px;
+  background: var(--bd-accent);
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.5;
+}
+
+.bd-gift__emoji {
+  font-size: 2rem;
+  line-height: 1;
+  transition: opacity 0.3s ease;
+}
+
+.bd-gift__box--opened .bd-gift__emoji {
+  opacity: 0;
+}
+
+.bd-gift__label {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--bd-secondary);
+}
+
+.bd-gift__reveal {
+  animation: bd-fade-up 0.8s var(--bd-ease) forwards;
+  padding: 2rem 0;
+}
+
+.bd-gift__reveal-text {
+  font-family: var(--font-serif);
+  font-size: clamp(1.2rem, 3vw, 1.7rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--bd-primary);
+  line-height: 1.5;
+  max-width: 40ch;
+  margin: 0 auto;
+}
+
+@keyframes bd-fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Confetti ────────────────────────────────────────────── */
+.bd-confetti {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 10;
+  overflow: visible;
+}
+
+.bd-confetti__piece {
+  position: absolute;
+  top: 0;
+  display: block;
+  border-radius: 2px;
+  animation: bd-confetti-fall linear forwards;
+}
+
+.bd-confetti__piece--circle {
+  border-radius: 50%;
+}
+
+@keyframes bd-confetti-fall {
+  0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(400px) rotate(var(--rotation, 360deg)); opacity: 0; }
+}
+
+/* ============================================================
+   FINAL SECTION
+   ============================================================ */
+.bd-final {
+  background: var(--bd-primary);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bd-final::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(217, 140, 155, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.bd-final__inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.bd-final__star {
+  display: block;
+  font-size: 1.2rem;
+  color: var(--bd-accent);
+  opacity: 0.7;
+  margin-bottom: 3rem;
+  transition-delay: 0s;
+}
+
+.bd-final__title-group {
+  margin-bottom: 2rem;
+  transition-delay: 0.2s;
+}
+
+.bd-final__happy {
+  font-family: var(--font-sans);
+  font-size: clamp(0.7rem, 2vw, 1rem);
+  font-weight: 500;
+  letter-spacing: 0.6em;
+  text-transform: uppercase;
+  color: var(--bd-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.bd-final__birthday {
+  font-family: var(--font-serif);
+  font-size: clamp(3rem, 10vw, 8rem);
+  font-weight: 300;
+  line-height: 0.9;
+  color: var(--bd-white);
+  letter-spacing: -0.02em;
+}
+
+.bd-final__name {
+  font-family: var(--font-serif);
+  font-size: clamp(1rem, 3vw, 1.8rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--bd-accent);
+  margin-bottom: 3rem;
+  transition-delay: 0.5s;
+}
+
+.bd-final__message {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+  transition-delay: 0.8s;
+}
+
+.bd-final__para {
+  font-family: var(--font-serif);
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--bd-secondary);
+}
+
+.bd-final__heart {
+  display: block;
+  font-size: 1.2rem;
+  color: var(--bd-accent);
+  margin-top: 1rem;
+  transition-delay: 1.2s;
+  animation: bd-heartbeat 2s ease-in-out 2s infinite;
+}
+
+@keyframes bd-heartbeat {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.15); }
+}
+
+.bd-confetti--final .bd-confetti__piece {
+  top: -20px;
+}
+
+/* ============================================================
+   MUSIC PLAYER
+   ============================================================ */
+.bd-music {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.5rem;
+  z-index: 99999;
+}
+
+.bd-music__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.55rem 1rem;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(217, 140, 155, 0.4);
+  border-radius: 999px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.bd-music__btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(217, 140, 155, 0.7);
+  box-shadow: 0 6px 24px rgba(217, 140, 155, 0.25);
+}
+
+.bd-music__btn:focus-visible {
+  outline: 2px solid var(--bd-accent);
+  outline-offset: 3px;
+}
+
+.bd-music__btn--playing {
+  background: rgba(23, 21, 21, 0.9);
+  border-color: rgba(217, 140, 155, 0.5);
+  box-shadow: 0 4px 25px rgba(217, 140, 155, 0.3);
+}
+
+.bd-music__btn--playing:hover {
+  background: rgba(15, 13, 13, 0.96);
+  box-shadow: 0 6px 30px rgba(217, 140, 155, 0.45);
+}
+
+.bd-music__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bd-accent);
+  transition: transform 0.25s ease, color 0.3s ease;
+}
+
+.bd-music__btn:hover .bd-music__icon {
+  transform: scale(1.12);
+}
+
+.bd-music__btn--playing .bd-music__icon {
+  color: var(--bd-soft-accent);
+}
+
+.bd-music__label {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bd-primary);
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+.bd-music__btn--playing .bd-music__label {
+  color: #FFFFFF;
+}
+
+.bd-music__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bd-accent);
+  display: inline-block;
+  animation: bd-music-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes bd-music-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.65);
+  }
+}
+
+.bd-music__bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2.5px;
+  height: 12px;
+}
+
+.bd-music__bar {
+  display: block;
+  width: 2px;
+  background: var(--bd-accent);
+  border-radius: 1px;
+  animation: bd-bar 0.8s ease-in-out infinite alternate;
+}
+
+.bd-music__bar:nth-child(1) { height: 6px; animation-delay: 0s; }
+.bd-music__bar:nth-child(2) { height: 12px; animation-delay: 0.25s; }
+.bd-music__bar:nth-child(3) { height: 7px; animation-delay: 0.15s; }
+
+@keyframes bd-bar {
+  from { transform: scaleY(0.3); }
+  to   { transform: scaleY(1); }
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.bd-footer {
+  background: var(--bd-primary);
+  padding: 2rem clamp(1.5rem, 5vw, 6rem);
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.bd-footer__text {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--bd-secondary);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 767px) {
+  .bd-corner { width: 20px; height: 20px; }
+  .bd-corner--tl { top: 1.25rem; left: 1.25rem; }
+  .bd-corner--tr { top: 1.25rem; right: 1.25rem; }
+  .bd-corner--bl { bottom: 1.25rem; left: 1.25rem; }
+  .bd-corner--br { bottom: 1.25rem; right: 1.25rem; }
+
+  .bd-memory__description { max-width: 100%; }
+
+  .bd-message::before { display: none; }
+
+  .bd-music {
+    top: 1rem;
+    right: 1rem;
+    bottom: auto;
+  }
+
+  .bd-final__birthday { letter-spacing: -0.01em; }
+}
+
+@media (max-width: 480px) {
+  .bd-countdown__grid {
+    gap: 1.5rem;
+  }
+
+  .bd-countdown__number {
+    font-size: 3rem;
+  }
+}
+
+/* ============================================================
+   BLOOMING BIRTHDAY GARDEN
+   Multi-layered · Organic · Cinematic Botanical System
+   ============================================================ */
+
+/* ─── Botanical Color Tokens ───────────────────────────────── */
+:root {
+  --flower-petal: #d98c9b;
+  --flower-petal-soft: #f2d0d7;
+  --flower-petal-warm: #e38699;
+  --flower-petal-dark: #ba6274;
+  --flower-center: #edd095;
+  --flower-center-dark: #c5974c;
+  --flower-stem: #78926c;
+  --flower-leaf: #8ca27d;
+}
+
+/* ─── Garden Master Stage ─────────────────────────────────── */
+.bd-garden {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Soft ambient lighting halo behind garden with gentle breathing */
+.bd-garden__halo {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 65%,
+    rgba(240, 215, 220, 0.35) 0%,
+    rgba(248, 245, 240, 0.16) 46%,
+    rgba(248, 245, 240, 0) 74%
+  );
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.bd-garden__halo--breathe {
+  animation: bd-garden-halo-breathe 8s ease-in-out infinite alternate;
+}
+
+@keyframes bd-garden-halo-breathe {
+  0% {
+    opacity: 0.72;
+    transform: scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+
+/* Ambient Dust Light Motes */
+.bd-garden__dust-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.bd-garden__dust-mote {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 235, 190, 0.7) 0%, rgba(255, 204, 128, 0) 70%);
+  filter: blur(0.5px);
+  opacity: 0.55;
+  animation: bd-garden-mote-float linear infinite alternate;
+}
+
+@keyframes bd-garden-mote-float {
+  0% {
+    transform: translate(0, 0) scale(0.85);
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(22px, -32px) scale(1.15);
+    opacity: 0.35;
+  }
+}
+
+/* ─── Garden Depth Layers (3-Tier Stacking) ───────────────── */
+.bd-garden__layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Background: smaller, subtle blur, low opacity */
+.bd-garden__layer--bg {
+  z-index: 1;
+  opacity: 0.55;
+  filter: blur(0.5px);
+}
+
+/* Midground: medium supporting flowers */
+.bd-garden__layer--mid {
+  z-index: 2;
+  opacity: 0.88;
+}
+
+/* Foreground: Hero flower + prominent accents */
+.bd-garden__layer--fore {
+  z-index: 4;
+  opacity: 1;
+}
+
+/* ─── Plant Nodes (Flowers & Leaves) ──────────────────────── */
+.bd-garden__flower {
+  position: absolute;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  transform-origin: bottom center;
+  will-change: transform;
+}
+
+.bd-garden__flower--hero {
+  z-index: 15;
+  pointer-events: auto !important;
+  cursor: pointer;
+}
+
+.bd-garden__leaf-node {
+  position: absolute;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  transform-origin: bottom center;
+  will-change: transform;
+}
+
+.bd-garden-svg {
+  width: auto;
+  overflow: visible;
+  filter: drop-shadow(0 8px 24px rgba(111, 103, 96, 0.08));
+}
+
+.bd-svg-hero-flower {
+  filter: drop-shadow(0 12px 32px rgba(111, 103, 96, 0.12));
+}
+
+/* ─── Ground Vegetation & Grass ───────────────────────────── */
+.bd-garden__ground-vegetation {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.bd-garden__grass {
+  position: absolute;
+  display: flex;
+  align-items: flex-end;
+  transform-origin: bottom center;
+  animation: bd-grass-sway 5s ease-in-out infinite alternate;
+}
+
+@keyframes bd-grass-sway {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(2deg) translateY(-1px); }
+  100% { transform: rotate(-2deg); }
+}
+
+/* ─── Fallen Ground Petals ────────────────────────────────── */
+.bd-garden__ground-petals {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.bd-garden__ground-petal {
+  position: absolute;
+  animation: bd-ground-petal-breathe 6.5s ease-in-out infinite alternate;
+}
+
+@keyframes bd-ground-petal-breathe {
+  0% { opacity: 0.55; transform: scale(0.98); }
+  50% { opacity: 0.75; transform: scale(1.02); }
+  100% { opacity: 0.55; transform: scale(0.98); }
+}
+
+/* ─── Layer-Specific Organic Wind Sway ────────────────────── */
+.bd-sway-group {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+/* Background: subtle sway (±1deg) */
+.bd-garden__layer--bg .bd-sway-group {
+  animation-name: bd-wind-sway-bg;
+}
+
+@keyframes bd-wind-sway-bg {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-1deg) translateY(-1px); }
+}
+
+/* Midground: medium sway (±1.5deg) */
+.bd-garden__layer--mid .bd-sway-group {
+  animation-name: bd-wind-sway-mid;
+}
+
+@keyframes bd-wind-sway-mid {
+  0%, 100% { transform: rotate(0deg); }
+  35% { transform: rotate(-1.5deg) translateY(-1.5px); }
+  75% { transform: rotate(1.2deg) translateY(-0.5px); }
+}
+
+/* Foreground: expressive sway (±2deg) */
+.bd-garden__layer--fore .bd-sway-group {
+  animation-name: bd-wind-sway-fore;
+}
+
+@keyframes bd-wind-sway-fore {
+  0%, 100% { transform: rotate(0deg); }
+  28% { transform: rotate(-2deg) translateY(-2px); }
+  72% { transform: rotate(1.8deg) translateY(-1px); }
+}
+
+/* Hero Flower: slow, majestic focal sway */
+.bd-sway-group--hero {
+  animation-name: bd-wind-sway-hero !important;
+}
+
+@keyframes bd-wind-sway-hero {
+  0%, 100% { transform: rotate(0deg); }
+  32% { transform: rotate(-1.3deg) translateY(-1.5px); }
+  70% { transform: rotate(1.1deg) translateY(-0.8px); }
+}
+
+/* ─── Interactive Garden Ripple Reaction ──────────────────── */
+/* When hero flower or garden is tapped, wind ripple propagates */
+.bd-hero--interactive-sway .bd-sway-group--hero,
+.bd-garden--ripple .bd-sway-group--hero {
+  animation: bd-ripple-hero 1.4s ease-in-out forwards !important;
+}
+
+.bd-hero--interactive-sway .bd-garden__layer--fore .bd-sway-group,
+.bd-garden--ripple .bd-garden__layer--fore .bd-sway-group {
+  animation: bd-ripple-fore 1.5s ease-in-out 0.12s forwards !important;
+}
+
+.bd-hero--interactive-sway .bd-garden__layer--mid .bd-sway-group,
+.bd-garden--ripple .bd-garden__layer--mid .bd-sway-group {
+  animation: bd-ripple-mid 1.6s ease-in-out 0.25s forwards !important;
+}
+
+@keyframes bd-ripple-hero {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-3.5deg) translateY(-3px) scale(1.02); }
+  60% { transform: rotate(2.8deg) translateY(-1px) scale(0.99); }
+  85% { transform: rotate(-0.8deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes bd-ripple-fore {
+  0% { transform: rotate(0deg); }
+  30% { transform: rotate(-2.8deg) translateY(-2px); }
+  65% { transform: rotate(2.2deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes bd-ripple-mid {
+  0% { transform: rotate(0deg); }
+  35% { transform: rotate(-2deg) translateY(-1.5px); }
+  70% { transform: rotate(1.6deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* ─── Organic Growth Animations ───────────────────────────── */
+/* Seed */
+.bd-grow-seed {
+  transform-box: fill-box;
+  transform-origin: center center;
+  opacity: 0;
+  animation: bd-seed-appear 0.6s ease-out forwards;
+}
+
+@keyframes bd-seed-appear {
+  0%   { opacity: 0; transform: scale(0); }
+  60%  { opacity: 1; transform: scale(1.3); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Stem Growth */
+.bd-grow-stem {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  transform: scaleY(0);
+  opacity: 0;
+  animation: bd-stem-grow 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes bd-stem-grow {
+  0%   { transform: scaleY(0); opacity: 0; }
+  15%  { opacity: 1; }
+  100% { transform: scaleY(1); opacity: 1; }
+}
+
+/* Leaf Unfurling */
+.bd-grow-leaf {
+  transform-box: fill-box;
+  opacity: 0;
+  transform: scale(0);
+  animation: bd-leaf-bloom 0.85s cubic-bezier(0.34, 1.35, 0.64, 1) forwards;
+}
+
+.bd-leaf-left {
+  transform-origin: 100% 50%;
+}
+
+.bd-leaf-right {
+  transform-origin: 0% 50%;
+}
+
+@keyframes bd-leaf-bloom {
+  0%   { opacity: 0; transform: scale(0); }
+  60%  { opacity: 0.9; transform: scale(1.15); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Blossom Petals */
+.bd-grow-petal {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  transform: scale(0);
+  opacity: 0;
+  animation: bd-petal-unfold 0.88s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+}
+
+.bd-hero-petal {
+  animation-duration: 0.95s;
+}
+
+.bd-petal-inner {
+  animation-timing-function: cubic-bezier(0.25, 1.1, 0.5, 1);
+}
+
+@keyframes bd-petal-unfold {
+  0%   { opacity: 0; transform: scale(0); }
+  55%  { opacity: 0.85; }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Center Discs & Buds */
+.bd-grow-bud {
+  transform-box: fill-box;
+  transform-origin: center center;
+  transform: scale(0);
+  opacity: 0;
+  animation: bd-bud-pop 0.7s cubic-bezier(0.34, 1.3, 0.64, 1) forwards;
+}
+
+.bd-grow-center {
+  transform-box: fill-box;
+  transform-origin: center center;
+  transform: scale(0);
+  opacity: 0;
+  animation: bd-bud-pop 0.55s ease-out forwards;
+}
+
+@keyframes bd-bud-pop {
+  0%   { opacity: 0; transform: scale(0); }
+  70%  { opacity: 1; transform: scale(1.18); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Tulip Petals */
+.bd-tulip-petal {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  transform: scale(0);
+  opacity: 0;
+  animation: bd-tulip-unfold 0.92s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+}
+
+.bd-tulip-petal--back {
+  animation-duration: 0.75s;
+}
+
+@keyframes bd-tulip-unfold {
+  0%   { opacity: 0; transform: scale(0) translateY(10px); }
+  60%  { opacity: 0.85; }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Lavender Florets */
+.bd-floret {
+  transform-box: fill-box;
+  transform-origin: center center;
+  transform: scale(0);
+  opacity: 0;
+  animation: bd-floret-pop 0.65s cubic-bezier(0.34, 1.45, 0.64, 1) forwards;
+}
+
+@keyframes bd-floret-pop {
+  0%   { opacity: 0; transform: scale(0); }
+  75%  { opacity: 1; transform: scale(1.22); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Rose / Peony Petals */
+.bd-rose-petal {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  transform: scale(0);
+  opacity: 0;
+  animation: bd-rose-unfold 0.95s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+}
+
+@keyframes bd-rose-unfold {
+  0%   { opacity: 0; transform: scale(0) rotate(-6deg); }
+  65%  { opacity: 0.88; }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* ─── Floating & Drifting Petals (Ambient Atmosphere) ──────── */
+.bd-garden__petals-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.bd-drifting-petal {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  animation-name: bd-drift-drift;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-iteration-count: infinite;
+}
+
+@keyframes bd-drift-drift {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0deg) scale(0.7);
+  }
+  16% {
+    opacity: 0.85;
+  }
+  75% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--drift-x, 80px), var(--drift-y, -100px)) rotate(160deg) scale(1.1);
+  }
+}
+
+/* ─── Responsive Adjustments (Desktop vs Mobile Garden) ────── */
+@media (max-width: 768px) {
+  /* Hide peripheral dense flowers/leaves that would clutter small viewports */
+  .bd-garden__flower--desktop-only,
+  .bd-garden__leaf--desktop-only {
+    display: none !important;
+  }
+
+  /* Adapt positions using CSS variables for clean mobile framing */
+  .bd-garden__flower {
+    left: var(--mobile-left, 50%) !important;
+    bottom: var(--mobile-bottom, 0px) !important;
+    transform: translateX(-50%) scale(var(--mobile-scale, 0.75)) !important;
+  }
+
+  .bd-garden__flower--hero {
+    bottom: -35px !important;
+    transform: translateX(-50%) scale(0.85) !important;
+  }
+
+  .bd-hero__text-scrim {
+    inset: -15px -12px;
+    filter: blur(16px);
+  }
+}
+
+/* ─── Reduced Motion ───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .bd-grow-seed,
+  .bd-grow-stem,
+  .bd-grow-leaf,
+  .bd-grow-petal,
+  .bd-grow-bud,
+  .bd-grow-center,
+  .bd-tulip-petal,
+  .bd-floret,
+  .bd-rose-petal,
+  .bd-sway-group,
+  .bd-drifting-petal,
+  .bd-garden__dust-mote,
+  .bd-garden__grass,
+  .bd-garden__ground-petal,
+  .bd-hero__text {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* ============================================================
+   MULTI-PAGE CHAPTER STORY SYSTEM
+   "A Birthday Story — One Page, One Moment"
+   ============================================================ */
+
+/* ─── Base Body & Page Transitions ─── */
+body.bd-body {
+  background: var(--bd-bg, #F8F5F0);
+  color: var(--bd-primary, #171515);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.bd-page-transition {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.bd-page-transition--active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bd-chapter-page {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.bd-chapter-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+/* ─── Chapter Progress Bar ─── */
+.bd-chapter-bar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: rgba(248, 245, 240, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(23, 21, 21, 0.05);
+  padding: 0.75rem clamp(1rem, 4vw, 2.5rem);
+}
+
+.bd-chapter-bar__inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.bd-chapter-bar__current {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.bd-chapter-bar__num {
+  font-weight: 600;
+  color: var(--bd-accent);
+}
+
+.bd-chapter-bar__sep {
+  opacity: 0.3;
+}
+
+.bd-chapter-bar__title {
+  color: var(--bd-secondary);
+  font-weight: 400;
+}
+
+.bd-chapter-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.bd-step-node {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.4rem;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.bd-step-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(23, 21, 21, 0.2);
+  transition: all 0.3s ease;
+}
+
+.bd-step-num {
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: var(--bd-secondary);
+  opacity: 0.45;
+  transition: all 0.3s ease;
+}
+
+.bd-step-node--active .bd-step-dot {
+  background: var(--bd-accent);
+  box-shadow: 0 0 8px rgba(217, 140, 155, 0.6);
+  transform: scale(1.3);
+}
+
+.bd-step-node--active .bd-step-num {
+  color: var(--bd-primary);
+  opacity: 1;
+  font-weight: 600;
+}
+
+.bd-step-node--passed .bd-step-dot {
+  background: var(--bd-accent);
+  opacity: 0.7;
+}
+
+.bd-step-line {
+  display: block;
+  width: clamp(14px, 3vw, 28px);
+  height: 1px;
+  background: rgba(23, 21, 21, 0.12);
+  transition: background 0.4s ease;
+}
+
+.bd-step-line--passed {
+  background: var(--bd-accent);
+  opacity: 0.6;
+}
+
+/* ─── Chapter Bottom Navigation Bar ─── */
+.bd-chapter-nav {
+  position: relative;
+  z-index: 20;
+  padding: clamp(2rem, 5vw, 3.5rem) clamp(1rem, 4vw, 2.5rem);
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.bd-chapter-nav__hint {
+  font-family: var(--font-serif);
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  font-style: italic;
+  color: var(--bd-secondary);
+  opacity: 0.8;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.bd-chapter-nav__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.bd-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0.75rem 1.6rem;
+  border-radius: 999px;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bd-nav-btn--back {
+  color: var(--bd-secondary);
+  background: transparent;
+  opacity: 0.7;
+}
+
+.bd-nav-btn--back:hover {
+  opacity: 1;
+  color: var(--bd-primary);
+  transform: translateX(-3px);
+}
+
+.bd-nav-btn--next {
+  color: #FFFFFF;
+  background: var(--bd-primary);
+  box-shadow: 0 4px 16px rgba(23, 21, 21, 0.12);
+}
+
+.bd-nav-btn--next:hover {
+  background: #2D2727;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(23, 21, 21, 0.2);
+}
+
+.bd-nav-btn__arrow {
+  transition: transform 0.3s ease;
+}
+
+.bd-nav-btn--next:hover .bd-nav-btn__arrow {
+  transform: translateX(4px);
+}
+
+.bd-nav-btn--spacer {
+  width: 1px;
+}
+
+/* ─── Chapter 01: Storybook Opening Experience ("Open the Story") ─── */
+.bd-intro-story-page {
+  min-height: 100svh;
+  width: 100%;
+  position: relative;
+  background: var(--bd-bg, #F8F5F0);
+  overflow: hidden;
+}
+
+.bd-storybook-stage {
+  min-height: 100svh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 1.5rem;
+}
+
+/* STEP 01: Ambient Glow & Particles */
+.bd-book-ambient-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  width: min(780px, 95vw);
+  height: min(780px, 95vw);
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    rgba(247, 230, 204, 0.58) 0%,
+    rgba(242, 222, 190, 0.26) 38%,
+    rgba(248, 245, 240, 0) 70%
+  );
+  filter: blur(32px);
+  opacity: 0;
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1;
+}
+
+.bd-storybook-stage--ready .bd-book-ambient-glow {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  animation: bd-ambient-breathe 8s ease-in-out infinite alternate;
+}
+
+@keyframes bd-ambient-breathe {
+  0% { opacity: 0.82; transform: translate(-50%, -50%) scale(0.98); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1.03); }
+}
+
+/* Subtle Dust Specks (3-4 slow specks) */
+.bd-book-dust-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.bd-book-dust {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--bd-accent, #D98C9B);
+  opacity: 0;
+  animation: bd-dust-float ease-in-out infinite;
+}
+
+.bd-book-dust--1 { width: 3px; height: 3px; left: 22%; top: 26%; animation-duration: 9s; animation-delay: 0.2s; opacity: 0.22; }
+.bd-book-dust--2 { width: 4px; height: 4px; left: 78%; top: 20%; animation-duration: 11s; animation-delay: 1.5s; opacity: 0.18; }
+.bd-book-dust--3 { width: 2.5px; height: 2.5px; left: 30%; top: 74%; animation-duration: 10s; animation-delay: 0.8s; opacity: 0.2; }
+.bd-book-dust--4 { width: 3.5px; height: 3.5px; left: 72%; top: 70%; animation-duration: 12s; animation-delay: 2.4s; opacity: 0.16; }
+
+@keyframes bd-dust-float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(-16px) translateX(6px); }
+}
+
+/* 3D Perspective Wrapper & Parallax Tilt */
+.bd-book-parallax-wrapper {
+  position: relative;
+  z-index: 10;
+  perspective: 1800px;
+  transform-style: preserve-3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bd-book-parallax-wrapper--idle-breathe {
+  animation: bd-book-float-breathe 7s ease-in-out infinite;
+}
+
+/* Zoom into Book transition to Chapter 2 */
+.bd-book-parallax-wrapper--zooming {
+  transform: scale(1.68) translateZ(140px) !important;
+  transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  pointer-events: none;
+}
+
+@keyframes bd-book-float-breathe {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.004) translateY(-2px); }
+}
+
+/* Ambient shadow underneath the book */
+.bd-book-ambient-shadow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateY(32px);
+  width: 380px;
+  height: 480px;
+  border-radius: 20px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(23, 21, 21, 0.24) 0%,
+    rgba(23, 21, 21, 0.1) 45%,
+    rgba(23, 21, 21, 0) 72%
+  );
+  filter: blur(24px);
+  transition: width 1.15s cubic-bezier(0.2, 0.8, 0.25, 1), transform 1.15s cubic-bezier(0.2, 0.8, 0.25, 1), opacity 0.8s ease;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.bd-book-ambient-shadow--open {
+  width: 780px;
+  transform: translate(-50%, -50%) translateY(36px);
+  opacity: 0.85;
+}
+
+/* Zoom expansion on ambient elements */
+.bd-storybook-stage--turning .bd-book-ambient-glow {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(2.2);
+  filter: blur(48px);
+  transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.95s ease;
+}
+
+.bd-storybook-stage--turning .bd-book-ambient-shadow {
+  opacity: 0.25;
+  transform: translate(-50%, -50%) translateY(52px) scale(1.35);
+  filter: blur(36px);
+  transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.8s ease;
+}
+
+/* Cinematic Zoom Bloom transition into Chapter 2 */
+.bd-book-zoom-bloom {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  background: radial-gradient(
+    circle at center,
+    rgba(248, 245, 240, 0.98) 0%,
+    rgba(248, 245, 240, 0.88) 45%,
+    rgba(248, 245, 240, 0.4) 85%
+  );
+  animation: bd-zoom-bloom 0.88s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+@keyframes bd-zoom-bloom {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  40% {
+    opacity: 0.55;
+  }
+  85% {
+    opacity: 0.96;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+/* The Storybook Body */
+.bd-storybook {
+  position: relative;
+  width: 760px;
+  height: 490px;
+  transform-style: preserve-3d;
+  opacity: 0;
+  transform: translateX(-190px) translateY(18px) scale(0.96);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 1.15s cubic-bezier(0.2, 0.8, 0.25, 1);
+}
+
+.bd-storybook--appear {
+  opacity: 1;
+  transform: translateX(-190px) translateY(0) scale(1);
+}
+
+.bd-storybook--open {
+  opacity: 1;
+  transform: translateX(0) translateY(0) scale(1);
+}
+
+.bd-storybook--turning {
+  transform: translateX(0) translateY(-6px) scale(1.04) !important;
+  transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+/* Wings (Left & Right Spreads) */
+.bd-book-wing {
+  position: absolute;
+  top: 0;
+  width: 380px;
+  height: 490px;
+  transform-style: preserve-3d;
+}
+
+.bd-book-wing--left {
+  left: 0;
+  transform-origin: right center;
+}
+
+.bd-book-wing--right {
+  left: 380px;
+  transform-origin: left center;
+}
+
+/* Hardcover base backing underneath pages */
+.bd-book-cover-base {
+  position: absolute;
+  inset: -3px;
+  border-radius: 4px;
+  background: #E8E1D5;
+  box-shadow: 
+    0 12px 28px -6px rgba(23, 21, 21, 0.18),
+    0 4px 12px -2px rgba(23, 21, 21, 0.08);
+  border: 1px solid rgba(23, 21, 21, 0.08);
+  pointer-events: none;
+}
+
+.bd-book-cover-base--left {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  box-shadow: -8px 12px 24px -6px rgba(23, 21, 21, 0.16);
+}
+
+.bd-book-cover-base--right {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  box-shadow: 8px 12px 24px -6px rgba(23, 21, 21, 0.16);
+}
+
+/* Layered Paper Edge Stack */
+.bd-book-edge-stack {
+  position: absolute;
+  inset: 0;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.bd-book-edge-stack--left {
+  box-shadow: 
+    inset 1px 0 0 #ECE6DC,
+    inset 2px 0 0 #E4DDD1,
+    inset 3px 0 0 #DDD5C7,
+    inset 4px 0 0 #D5CCA8,
+    inset 0 1px 0 #ECE6DC,
+    inset 0 -1px 0 #DDD5C7;
+}
+
+.bd-book-edge-stack--right {
+  box-shadow: 
+    inset -1px 0 0 #ECE6DC,
+    inset -2px 0 0 #E4DDD1,
+    inset -3px 0 0 #DDD5C7,
+    inset -4px 0 0 #D5CCA8,
+    inset 0 1px 0 #ECE6DC,
+    inset 0 -1px 0 #DDD5C7;
+}
+
+/* Page Sheets */
+.bd-book-page {
+  position: absolute;
+  inset: 2px 3px 2px 3px;
+  border-radius: 2px;
+  background: #FCFAF6;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+
+.bd-storybook--open .bd-book-page {
+  animation: bd-paper-settle 0.65s cubic-bezier(0.2, 0.8, 0.25, 1);
+}
+
+@keyframes bd-paper-settle {
+  0% { transform: translateY(2px); }
+  60% { transform: translateY(-1px); }
+  100% { transform: translateY(0); }
+}
+
+.bd-book-page--lifted {
+  transform: translateZ(4px) rotateY(-1.8deg);
+  box-shadow: 6px 10px 20px -4px rgba(23, 21, 21, 0.14);
+}
+
+.bd-book-page-paper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: 
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(248, 244, 237, 0.95) 100%),
+    radial-gradient(circle at 50% 50%, #FCFAF6 0%, #F6F1E7 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.bd-book-page--left .bd-book-page-paper {
+  box-shadow: inset -14px 0 16px -8px rgba(23, 21, 21, 0.08);
+}
+
+.bd-book-page--right .bd-book-page-paper {
+  box-shadow: inset 14px 0 16px -8px rgba(23, 21, 21, 0.08);
+}
+
+/* Center Spine & Gutter */
+.bd-book-spine {
+  position: absolute;
+  left: 380px;
+  top: -4px;
+  bottom: -4px;
+  width: 22px;
+  transform: translateX(-50%);
+  z-index: 20;
+  pointer-events: none;
+}
+
+.bd-book-spine-shadow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(23, 21, 21, 0.16) 0%,
+    rgba(23, 21, 21, 0.05) 30%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(23, 21, 21, 0.05) 70%,
+    rgba(23, 21, 21, 0.16) 100%
+  );
+}
+
+/* STEP 04: Warm Sunlight Glow from the Center */
+.bd-book-center-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.6);
+  width: 140px;
+  height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 238, 210, 0.6) 0%,
+    rgba(255, 225, 185, 0.24) 45%,
+    rgba(255, 225, 185, 0) 75%
+  );
+  filter: blur(14px);
+  opacity: 0;
+  transition: opacity 1.2s ease, transform 1.2s cubic-bezier(0.2, 0.8, 0.25, 1);
+  pointer-events: none;
+}
+
+.bd-book-center-glow--active {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  animation: bd-center-glow-breathe 6s ease-in-out infinite alternate;
+}
+
+@keyframes bd-center-glow-breathe {
+  0% { opacity: 0.72; transform: translate(-50%, -50%) scale(0.96); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1.04); }
+}
+
+/* Silk Ribbon */
+.bd-book-ribbon {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 9px;
+  height: 120px;
+  background: linear-gradient(180deg, #D98C9B 0%, #C47988 100%);
+  box-shadow: 2px 4px 10px rgba(23, 21, 21, 0.2);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 6px), 0 100%);
+  opacity: 0.9;
+}
+
+/* Front Hardcover Flipper */
+.bd-book-cover-flipper {
+  position: absolute;
+  left: 380px;
+  top: -4px;
+  width: 384px;
+  height: 498px;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  z-index: 28;
+  transition: transform 1.15s cubic-bezier(0.2, 0.8, 0.25, 1);
+  transform: rotateY(0deg);
+}
+
+.bd-book-cover-flipper--open {
+  transform: rotateY(-180deg);
+  pointer-events: none;
+}
+
+.bd-book-cover-front {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 4px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  background: 
+    linear-gradient(135deg, #EEE7DC 0%, #E2DACB 50%, #DDD4C4 100%);
+  box-shadow: 
+    0 18px 40px -8px rgba(23, 21, 21, 0.22),
+    0 6px 16px -2px rgba(23, 21, 21, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  overflow: hidden;
+}
+
+.bd-book-cover-cloth-texture {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, transparent 60%),
+    linear-gradient(90deg, rgba(23, 21, 21, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 4px 100%;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.bd-book-cover-spine-edge {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  background: linear-gradient(90deg, rgba(23, 21, 21, 0.25) 0%, rgba(23, 21, 21, 0.08) 35%, transparent 100%);
+  pointer-events: none;
+}
+
+.bd-book-cover-frame {
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(111, 103, 96, 0.3);
+  padding: 6px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bd-book-cover-inner-border {
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(111, 103, 96, 0.18);
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1.5rem;
+  position: relative;
+}
+
+.bd-book-cover-eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #8C8278;
+  margin-bottom: 1.4rem;
+}
+
+.bd-book-cover-title {
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: 0.12em;
+  color: #262220;
+  margin-bottom: 1.2rem;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+.bd-book-cover-sub {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  color: #7D736A;
+  margin-bottom: 1.6rem;
+}
+
+.bd-book-cover-emblem {
+  color: #B29F8B;
+  opacity: 0.8;
+}
+
+.bd-book-cover-inside {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: rotateY(180deg);
+  border-radius: 4px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  background: #E8E1D5;
+  box-shadow: -8px 12px 24px -6px rgba(23, 21, 21, 0.16);
+  overflow: hidden;
+}
+
+.bd-book-cover-inside-paper {
+  position: absolute;
+  inset: 4px;
+  background: #F4EFE6;
+  border: 1px solid rgba(23, 21, 21, 0.05);
+}
+
+/* Page Content & Reveals */
+.bd-book-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 3rem 2.8rem 2.2rem 2.8rem;
+  position: relative;
+  z-index: 10;
+}
+
+.bd-book-content--left {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-right: 3.4rem;
+}
+
+.bd-book-content--right {
+  justify-content: center;
+  text-align: left;
+  padding-left: 3.4rem;
+}
+
+.bd-book-mobile-header {
+  display: none;
+}
+
+.bd-book-reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  filter: blur(5px);
+  transition: 
+    opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bd-book-reveal--visible {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* Typography */
+.bd-book-chapter-tag {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--bd-accent, #D98C9B);
+  margin-bottom: 0.6rem;
+}
+
+.bd-book-numeral {
+  font-family: var(--font-serif);
+  font-size: clamp(4.5rem, 8vw, 6rem);
+  font-weight: 300;
+  line-height: 0.95;
+  color: var(--bd-primary, #171515);
+  margin-bottom: 1.2rem;
+  letter-spacing: 0.02em;
+}
+
+.bd-book-divider-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+}
+
+.bd-book-divider-line {
+  width: 36px;
+  height: 1px;
+  background: rgba(23, 21, 21, 0.18);
+  position: relative;
+}
+
+.bd-book-botanical-wrap {
+  display: flex;
+  justify-content: center;
+  color: var(--bd-secondary, #6F6760);
+  opacity: 0.65;
+}
+
+.bd-book-leaf-svg {
+  animation: bd-leaf-breathe 6s ease-in-out infinite alternate;
+  transform-origin: center bottom;
+}
+
+@keyframes bd-leaf-breathe {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(2deg); }
+  100% { transform: rotate(-1.5deg); }
+}
+
+.bd-book-story-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.8rem, 3.2vw, 2.3rem);
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bd-primary, #171515);
+  margin-bottom: 1.5rem;
+  line-height: 1.15;
+}
+
+.bd-book-story-body {
+  margin-bottom: 2rem;
+}
+
+.bd-book-stanza-main {
+  font-family: var(--font-serif);
+  font-size: clamp(1.25rem, 2.3vw, 1.6rem);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--bd-primary, #171515);
+  margin-bottom: 1rem;
+}
+
+.bd-book-stanza-sub {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--bd-secondary, #6F6760);
+  letter-spacing: 0.02em;
+}
+
+/* Page Footers */
+.bd-book-page-footer {
+  position: absolute;
+  bottom: 1.6rem;
+  display: flex;
+  align-items: center;
+}
+
+.bd-book-page-footer--left {
+  left: 2.8rem;
+}
+
+.bd-book-page-footer--right {
+  right: 2.8rem;
+  left: 3.4rem;
+  justify-content: space-between;
+}
+
+.bd-book-folio {
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  color: rgba(111, 103, 96, 0.6);
+  text-transform: uppercase;
+}
+
+/* "Turn the page →" Button */
+.bd-book-turn-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--bd-primary, #171515);
+  border-bottom: 1px solid rgba(23, 21, 21, 0.22);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  outline-offset: 4px;
+}
+
+.bd-book-turn-btn:hover {
+  border-bottom-color: var(--bd-primary, #171515);
+  color: var(--bd-primary, #171515);
+}
+
+.bd-book-turn-arrow {
+  transition: transform 0.3s ease;
+  font-size: 0.85rem;
+}
+
+.bd-book-turn-btn:hover .bd-book-turn-arrow {
+  transform: translateX(4px);
+}
+
+.bd-book-turn-btn--fading {
+  opacity: 0 !important;
+  transform: translateY(6px) !important;
+  pointer-events: none;
+}
+
+.bd-book-curl-hint {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, transparent 50%, rgba(23, 21, 21, 0.04) 50%, rgba(255, 255, 255, 0.8) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.bd-book-curl-hint--hover {
+  opacity: 1;
+}
+
+/* STEP 11: Turning Leaf Animation to Chapter 2 */
+.bd-book-turning-leaf {
+  position: absolute;
+  left: 380px;
+  top: 0;
+  width: 380px;
+  height: 490px;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  z-index: 35;
+  animation: bd-page-turn-flip 0.9s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes bd-page-turn-flip {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(-180deg); }
+}
+
+.bd-book-turning-leaf-front,
+.bd-book-turning-leaf-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 2px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.bd-book-turning-leaf-front {
+  background: #FCFAF6;
+  box-shadow: 8px 12px 24px -4px rgba(23, 21, 21, 0.25);
+  overflow: hidden;
+}
+
+.bd-book-turning-leaf-paper {
+  position: absolute;
+  inset: 0;
+  background: 
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(248, 244, 237, 0.95) 100%);
+}
+
+.bd-book-turning-shadow-sweep {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(23, 21, 21, 0.35) 0%, rgba(23, 21, 21, 0.05) 40%, transparent 100%);
+  animation: bd-shadow-sweep 0.9s ease forwards;
+}
+
+@keyframes bd-shadow-sweep {
+  0% { opacity: 0; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.1; }
+}
+
+.bd-book-turning-leaf-back {
+  transform: rotateY(180deg);
+  background: #F8F4EC;
+  box-shadow: -8px 12px 24px -4px rgba(23, 21, 21, 0.2);
+}
+
+/* Tablet Responsive */
+@media (max-width: 840px) and (min-width: 641px) {
+  .bd-storybook {
+    width: 660px;
+    height: 440px;
+    transform: translateX(-165px) translateY(18px) scale(0.96);
+  }
+
+  .bd-storybook--appear {
+    transform: translateX(-165px) translateY(0) scale(1);
+  }
+
+  .bd-storybook--open {
+    transform: translateX(0) translateY(0) scale(1);
+  }
+
+  .bd-book-ambient-shadow--open {
+    width: 680px;
+  }
+
+  .bd-book-wing {
+    width: 330px;
+    height: 440px;
+  }
+
+  .bd-book-wing--right {
+    left: 330px;
+  }
+
+  .bd-book-spine {
+    left: 330px;
+  }
+
+  .bd-book-cover-flipper {
+    left: 330px;
+    width: 334px;
+    height: 448px;
+  }
+
+  .bd-book-turning-leaf {
+    left: 330px;
+    width: 330px;
+    height: 440px;
+  }
+
+  .bd-book-content {
+    padding: 2.2rem 2rem 1.8rem 2rem;
+  }
+}
+
+/* Mobile Responsive (< 640px) */
+@media (max-width: 640px) {
+  .bd-storybook-stage {
+    padding: 1rem;
+  }
+
+  .bd-storybook {
+    width: min(88vw, 360px);
+    height: min(76vh, 520px);
+    transform: translateX(0) translateY(16px) scale(0.96);
+  }
+
+  .bd-storybook--appear,
+  .bd-storybook--open {
+    transform: translateX(0) translateY(0) scale(1);
+  }
+
+  .bd-book-ambient-shadow {
+    width: min(88vw, 360px);
+    height: min(76vh, 520px);
+  }
+
+  .bd-book-ambient-shadow--open {
+    width: min(88vw, 360px);
+  }
+
+  .bd-book-parallax-wrapper--zooming {
+    transform: scale(1.52) translateY(-14px) !important;
+  }
+
+  .bd-book-wing--left {
+    display: none;
+  }
+
+  .bd-book-wing--right {
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .bd-book-cover-base--right {
+    border-radius: 4px;
+    box-shadow: 0 16px 36px -6px rgba(23, 21, 21, 0.2);
+  }
+
+  .bd-book-edge-stack--right {
+    box-shadow: 
+      inset 0 -2px 0 #E4DDD1,
+      inset -2px 0 0 #DDD5C7,
+      inset 2px 0 0 #DDD5C7;
+  }
+
+  .bd-book-spine {
+    display: none;
+  }
+
+  .bd-book-cover-flipper {
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+  }
+
+  .bd-book-cover-front {
+    border-radius: 4px;
+  }
+
+  .bd-book-turning-leaf {
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .bd-book-content--right {
+    padding: 2rem 1.6rem 1.6rem 1.6rem;
+    align-items: center;
+    text-align: center;
+    justify-content: space-between;
+  }
+
+  .bd-book-mobile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .bd-book-numeral--mobile {
+    font-size: 3.6rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .bd-book-story-title {
+    font-size: 1.45rem;
+    margin-bottom: 0.6rem;
+    letter-spacing: 0.12em;
+  }
+
+  .bd-book-stanza-main {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .bd-book-stanza-sub {
+    font-size: 0.78rem;
+  }
+
+  .bd-book-page-footer--right {
+    position: static;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding: 0;
+  }
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  .bd-storybook,
+  .bd-book-cover-flipper,
+  .bd-book-turning-leaf,
+  .bd-book-reveal {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .bd-book-cover-flipper {
+    display: none !important;
+  }
+
+  .bd-storybook--open {
+    opacity: 1 !important;
+  }
+
+  .bd-book-reveal {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+}
+
+/* ─── Chapter 05: A Date Written in the Sky (Cosmic Night Sky) ─── */
+.bd-chapter-cosmic-page {
+  min-height: 100svh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #080B1A;
+  color: #F5F1EA;
+}
+
+.bd-cosmic-stage {
+  min-height: 100svh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 3.5rem 1.5rem 2.5rem 1.5rem;
+  background: #080B1A;
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bd-cosmic-stage--transitioning {
+  opacity: 0.15;
+}
+
+/* 01: Deep Night Sky Atmosphere Gradient */
+.bd-cosmic-atmosphere {
+  position: absolute;
+  inset: -40px;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 95% 75% at 50% 28%,
+    #251C3E 0%,
+    #17152F 35%,
+    #0E1024 68%,
+    #080B1A 100%
+  );
+  animation: bd-sky-drift 26s ease-in-out infinite alternate;
+}
+
+@keyframes bd-sky-drift {
+  0% {
+    transform: scale(1) translate(0, 0);
+    opacity: 0.94;
+  }
+  50% {
+    transform: scale(1.05) translate(-1%, 1.5%);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translate(1%, -1%);
+    opacity: 0.92;
+  }
+}
+
+/* Sky Grain / Organic Texture */
+.bd-cosmic-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: radial-gradient(#FFFFFF 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Subtle Floating Stardust Specks (6 particles) */
+.bd-cosmic-dust-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bd-cosmic-dust {
+  position: absolute;
+  border-radius: 50%;
+  background: #D8C59A;
+  opacity: 0;
+  animation: bd-cosmic-dust-float ease-in-out infinite;
+}
+
+.bd-cosmic-dust--1 { width: 2px; height: 2px; left: 16%; top: 24%; animation-duration: 12s; animation-delay: 0.5s; opacity: 0.25; }
+.bd-cosmic-dust--2 { width: 3px; height: 3px; left: 82%; top: 18%; animation-duration: 15s; animation-delay: 2s;   opacity: 0.18; }
+.bd-cosmic-dust--3 { width: 1.5px; height: 1.5px; left: 34%; top: 78%; animation-duration: 14s; animation-delay: 1.2s; opacity: 0.22; }
+.bd-cosmic-dust--4 { width: 2.5px; height: 2.5px; left: 68%; top: 82%; animation-duration: 16s; animation-delay: 3.5s; opacity: 0.15; }
+.bd-cosmic-dust--5 { width: 2px; height: 2px; left: 52%; top: 12%; animation-duration: 13s; animation-delay: 4.2s; opacity: 0.2; }
+.bd-cosmic-dust--6 { width: 1.5px; height: 1.5px; left: 88%; top: 62%; animation-duration: 17s; animation-delay: 1.8s; opacity: 0.18; }
+
+@keyframes bd-cosmic-dust-float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(-24px) translateX(8px); }
+}
+
+/* 02: Ambient Starfield Parallax Layers */
+.bd-cosmic-starfield {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bd-cosmic-stage--transitioning .bd-cosmic-starfield {
+  transform: translateY(-45px) !important;
+  opacity: 0.2;
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s ease !important;
+}
+
+.bd-cosmic-star {
+  position: absolute;
+  border-radius: 50%;
+  background: #F5F1EA;
+  opacity: 0;
+  transition: opacity 2s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: bd-star-twinkle ease-in-out infinite alternate;
+}
+
+.bd-cosmic-star--visible {
+  opacity: 1;
+}
+
+.bd-cosmic-star--mid {
+  box-shadow: 0 0 5px rgba(216, 197, 154, 0.45);
+}
+
+@keyframes bd-star-twinkle {
+  0% {
+    opacity: 0.25;
+    transform: scale(0.85);
+  }
+  100% {
+    opacity: 0.85;
+    transform: scale(1.15);
+  }
+}
+
+/* 07: Single Diagonal Shooting Star */
+.bd-cosmic-shooting-star {
+  position: absolute;
+  top: 15%;
+  right: 18%;
+  width: 240px;
+  height: 2px;
+  pointer-events: none;
+  z-index: 8;
+  transform: rotate(-35deg);
+  animation: bd-shoot-streak 1.1s cubic-bezier(0.15, 0.85, 0.35, 1) forwards;
+}
+
+.bd-cosmic-shooting-star--final {
+  top: 25%;
+  right: 12%;
+  width: 320px;
+  animation: bd-shoot-streak 0.8s cubic-bezier(0.15, 0.85, 0.35, 1) forwards;
+}
+
+.bd-cosmic-shooting-trail {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(216, 197, 154, 0.8) 25%,
+    rgba(216, 197, 154, 0.15) 70%,
+    transparent 100%
+  );
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
+  border-radius: 999px;
+}
+
+@keyframes bd-shoot-streak {
+  0% {
+    opacity: 0;
+    transform: rotate(-35deg) translateX(80px) scaleX(0.3);
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(-35deg) translateX(-360px) scaleX(1.3);
+  }
+}
+
+/* 04 & 05: The Libra Constellation Container (The Scales) */
+.bd-libra-constellation-container {
+  position: relative;
+  z-index: 10;
+  width: min(460px, 92vw);
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
+  margin-bottom: 1.5rem;
+}
+
+.bd-libra-constellation-container--zoom {
+  transform: scale(1.04) !important;
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.bd-libra-constellation-container--transitioning {
+  filter: brightness(1.25) drop-shadow(0 0 14px rgba(216, 197, 154, 0.4));
+}
+
+.bd-libra-constellation-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 0 8px rgba(216, 197, 154, 0.2));
+}
+
+/* Libra Connecting Lines */
+.bd-libra-line {
+  stroke: rgba(216, 197, 154, 0.42);
+  stroke-width: 0.95;
+  stroke-linecap: round;
+  stroke-dasharray: 220;
+  stroke-dashoffset: 220;
+  animation: bd-libra-connect 1.7s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
+  transition: stroke 0.45s ease, stroke-width 0.45s ease, opacity 0.45s ease;
+}
+
+.bd-libra-line--subtle {
+  stroke: rgba(216, 197, 154, 0.22);
+  stroke-dasharray: 4 4;
+}
+
+.bd-libra-line--hovered {
+  stroke: rgba(216, 197, 154, 0.88);
+  stroke-width: 1.25;
+  filter: drop-shadow(0 0 4px rgba(216, 197, 154, 0.7));
+}
+
+@keyframes bd-libra-connect {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Primary Libra Stars */
+.bd-libra-star-group {
+  cursor: pointer;
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bd-libra-star-aura {
+  fill: rgba(216, 197, 154, 0.16);
+  transition: r 1.4s cubic-bezier(0.16, 1, 0.3, 1), fill 1.4s ease;
+  animation: bd-aura-breath 5s ease-in-out infinite alternate;
+}
+
+@keyframes bd-aura-breath {
+  0% { transform: scale(0.92); opacity: 0.6; }
+  100% { transform: scale(1.08); opacity: 0.95; }
+}
+
+.bd-libra-star-core {
+  fill: #FFFDF8;
+  transition: r 1.2s cubic-bezier(0.16, 1, 0.3, 1), fill 0.3s ease;
+}
+
+.bd-libra-star-group--awake .bd-libra-star-aura {
+  fill: rgba(216, 197, 154, 0.28);
+}
+
+/* Sequential cosmic wave rhythm (star -> star -> star) */
+.bd-libra-star-group--wave .bd-libra-star-core {
+  fill: #FFFFFF;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.9));
+  transform: scale(1.35);
+}
+
+.bd-libra-star-group--hovered .bd-libra-star-core {
+  fill: #FFFFFF;
+  filter: drop-shadow(0 0 8px rgba(216, 197, 154, 0.9));
+}
+
+.bd-libra-star-glint {
+  opacity: 0.88;
+  animation: bd-glint-spin 12s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes bd-glint-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 06: Cosmic Pulse Effect (Once, 1.2s) */
+.bd-libra-constellation-container--pulse {
+  animation: bd-libra-pulse 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes bd-libra-pulse {
+  0% {
+    filter: drop-shadow(0 0 0px transparent);
+  }
+  40% {
+    filter: drop-shadow(0 0 24px rgba(216, 197, 154, 0.85));
+    transform: scale(1.025);
+  }
+  100% {
+    filter: drop-shadow(0 0 8px rgba(216, 197, 154, 0.25));
+    transform: scale(1);
+  }
+}
+
+/* 05: Libra as a Symbol (Subtle & Editorial, NOT Horoscope) */
+.bd-libra-symbol-caption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  margin-top: 0.65rem;
+  margin-bottom: 0.25rem;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 1.3s cubic-bezier(0.16, 1, 0.3, 1), transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bd-libra-symbol-caption--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bd-libra-symbol-title {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.38em;
+  color: #D8C59A;
+  text-transform: uppercase;
+}
+
+.bd-libra-symbol-sep {
+  color: rgba(216, 197, 154, 0.4);
+  font-size: 0.75rem;
+}
+
+.bd-libra-symbol-sub {
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  color: rgba(245, 241, 234, 0.6);
+  text-transform: uppercase;
+}
+
+/* 07: Date Display (07 OCTOBER) */
+.bd-cosmic-date-display {
+  text-align: center;
+  margin-top: 0.4rem;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1), transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bd-cosmic-date-display--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bd-cosmic-numeral {
+  font-family: var(--font-serif);
+  font-size: clamp(3rem, 6vw, 4.2rem);
+  font-weight: 300;
+  letter-spacing: 0.16em;
+  color: #F5F1EA;
+  line-height: 0.95;
+  text-shadow: 0 0 24px rgba(216, 197, 154, 0.32);
+  margin-bottom: 0.35rem;
+}
+
+.bd-cosmic-month {
+  font-family: var(--font-sans);
+  font-size: clamp(0.72rem, 1.5vw, 0.86rem);
+  font-weight: 500;
+  letter-spacing: 0.44em;
+  color: #D8C59A;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+/* 08: Main Poetic Message */
+.bd-cosmic-content {
+  position: relative;
+  z-index: 15;
+  text-align: center;
+  max-width: 520px;
+  width: 100%;
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s, transform 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
+}
+
+.bd-cosmic-content--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bd-cosmic-message-block {
+  margin-bottom: 2rem;
+}
+
+.bd-cosmic-line {
+  font-family: var(--font-serif);
+  font-size: clamp(1.35rem, 2.6vw, 1.85rem);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.48;
+  color: #F5F1EA;
+  margin-bottom: 1.1rem;
+}
+
+.bd-cosmic-line--2 {
+  color: #EAE2D1;
+  text-shadow: 0 0 16px rgba(216, 197, 154, 0.2);
+}
+
+.bd-cosmic-signature {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  margin-top: 1.8rem;
+}
+
+.bd-cosmic-date-tag {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  color: #D8C59A;
+}
+
+.bd-cosmic-name {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.35em;
+  color: rgba(245, 241, 234, 0.82);
+}
+
+/* Minimal Editorial Continue Button */
+.bd-cosmic-action {
+  display: flex;
+  justify-content: center;
+}
+
+.bd-cosmic-continue-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0;
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(245, 241, 234, 0.75);
+  border-bottom: 1px solid rgba(216, 197, 154, 0.3);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  outline-offset: 4px;
+}
+
+.bd-cosmic-continue-btn:hover {
+  color: #F5F1EA;
+  border-bottom-color: #D8C59A;
+}
+
+.bd-cosmic-continue-arrow {
+  transition: transform 0.3s ease;
+  font-size: 0.85rem;
+}
+
+.bd-cosmic-continue-btn:hover .bd-cosmic-continue-arrow {
+  transform: translateX(5px);
+}
+
+.bd-cosmic-astral-detail {
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.35em;
+  color: rgba(216, 197, 154, 0.55);
+  text-transform: uppercase;
+  margin-top: 1.1rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+  .bd-cosmic-stage {
+    padding: 2.5rem 1.2rem 2rem 1.2rem;
+  }
+
+  .bd-libra-constellation-container {
+    width: min(340px, 94vw);
+    margin-bottom: 1.25rem;
+  }
+
+  .bd-cosmic-numeral {
+    font-size: 2.8rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .bd-cosmic-month {
+    font-size: 0.7rem;
+    letter-spacing: 0.36em;
+  }
+
+  .bd-cosmic-line {
+    font-size: 1.25rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .bd-cosmic-message-block {
+    margin-bottom: 1.6rem;
+  }
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  .bd-cosmic-atmosphere,
+  .bd-cosmic-dust,
+  .bd-cosmic-star,
+  .bd-cosmic-shooting-star,
+  .bd-constellation-line,
+  .bd-primary-star-aura,
+  .bd-primary-star-glint {
+    animation: none !important;
+  }
+
+  .bd-constellation-line {
+    stroke-dashoffset: 0 !important;
+  }
+
+  .bd-cosmic-shooting-star {
+    display: none !important;
+  }
+
+  .bd-cosmic-date-display,
+  .bd-cosmic-content {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ─── Chapter 06: Final Cinematic Surprise ─── */
+.bd-final-cinematic {
+  min-height: calc(100svh - 60px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: clamp(3rem, 8vw, 6rem) 1.5rem;
+  overflow: hidden;
+}
+
+.bd-final-cinematic__bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, #262121 0%, #171515 100%);
+  z-index: 1;
+  animation: bd-fade-in 1.2s ease-out forwards;
+}
+
+.bd-final-cinematic__inner {
+  position: relative;
+  z-index: 10;
+  max-width: 680px;
+  margin: 0 auto;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+.bd-final-intro-line {
+  font-family: var(--font-sans);
+  font-size: clamp(0.75rem, 1.6vw, 0.9rem);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--bd-soft-accent, #F0D7DC);
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 1.2s var(--bd-ease), transform 1.2s var(--bd-ease);
+  margin-bottom: 1.5rem;
+}
+
+.bd-final-intro-line--visible {
+  opacity: 0.85;
+  transform: translateY(0);
+}
+
+.bd-final-wish-line {
+  font-family: var(--font-serif);
+  font-size: clamp(1.3rem, 3.2vw, 2.2rem);
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.9);
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 1.2s var(--bd-ease), transform 1.2s var(--bd-ease);
+  margin-bottom: 2.5rem;
+}
+
+.bd-final-wish-line--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bd-final-reveal-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  opacity: 0;
+  transform: scale(0.95) translateY(20px);
+  transition: opacity 1.4s var(--bd-ease), transform 1.4s var(--bd-ease);
+  margin-bottom: 2.75rem;
+}
+
+.bd-final-reveal-group--visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.bd-final-sparkle {
+  color: var(--bd-accent);
+  font-size: 1.2rem;
+  animation: bd-sparkle-pulse 3s ease-in-out infinite;
+}
+
+.bd-final-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.bd-final-title__top {
+  font-family: var(--font-sans);
+  font-size: clamp(0.85rem, 2vw, 1.2rem);
+  letter-spacing: 0.35em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.bd-final-title__name {
+  font-family: var(--font-serif);
+  font-size: clamp(3rem, 8vw, 5.8rem);
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  color: var(--bd-soft-accent, #F0D7DC);
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.bd-final-closing {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 1.2s var(--bd-ease), transform 1.2s var(--bd-ease);
+}
+
+.bd-final-closing--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bd-final-message-note {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.65);
+  max-width: 38ch;
+  margin: 0 auto 2.5rem auto;
+  white-space: pre-line;
+}
+
+.bd-nav-btn--replay {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+}
+
+.bd-nav-btn--replay:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.bd-final-petals {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.bd-final-petal {
+  position: absolute;
+  top: -20px;
+  width: 14px;
+  height: 20px;
+  background: var(--flower-petal);
+  border-radius: 50% 50% 50% 10%;
+  opacity: 0.5;
+  animation: bd-petal-fall 8s linear infinite;
+}
+
+@keyframes bd-petal-fall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+  15% { opacity: 0.6; }
+  85% { opacity: 0.5; }
+  100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+}
+
+/* ============================================================
+   CONTINUOUS AMBIENT & IDLE ANIMATION SYSTEM
+   Every page alive · Elegant · Subtle · Cinematic
+   ============================================================ */
+
+/* ─── Layer 2: Universal Ambient Light Beam ─── */
+.bd-ambient-light {
+  position: absolute;
+  top: 15%;
+  left: 30%;
+  width: clamp(280px, 48vw, 560px);
+  height: clamp(280px, 48vh, 560px);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(240, 215, 220, 0.42) 0%,
+    rgba(248, 245, 240, 0.12) 50%,
+    transparent 75%
+  );
+  filter: blur(48px);
+  pointer-events: none;
+  z-index: 1;
+  animation: bd-ambient-shift 16s ease-in-out infinite;
+}
+
+@keyframes bd-ambient-shift {
+  0%, 100% {
+    transform: translate(-6%, -4%) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(6%, 5%) scale(1.1);
+    opacity: 0.9;
+  }
+}
+
+/* ─── Chapter 01: Breathing Typography & Button Float ─── */
+.bd-intro-headline--breathe {
+  animation: bd-text-breathe 7.5s ease-in-out infinite;
+}
+
+.bd-intro-open-btn--breathe {
+  animation: bd-btn-float 4.5s ease-in-out infinite;
+}
+
+@keyframes bd-btn-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.bd-corner--breathe {
+  animation: bd-corner-breathe 5.5s ease-in-out infinite;
+}
+
+@keyframes bd-corner-breathe {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.65; }
+}
+
+/* ─── Chapter 02: Flower Breathing & Interactive Breeze ─── */
+.bd-hero__title--breathe,
+.bd-hero__name--breathe {
+  animation: bd-text-breathe 6.5s ease-in-out infinite;
+}
+
+@keyframes bd-text-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.95; }
+}
+
+/* Interactive click sway */
+.bd-hero--interactive-sway .bd-sway-group {
+  animation: bd-interactive-breeze 1.3s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+@keyframes bd-interactive-breeze {
+  0% { transform: rotate(0deg); }
+  30% { transform: rotate(-4.2deg) translateY(-3px); }
+  65% { transform: rotate(2.8deg) translateY(-1px); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Flower center subtle breathing */
+.bd-grow-bud,
+.bd-grow-center {
+  animation: bd-bud-pop 0.7s cubic-bezier(0.34, 1.3, 0.64, 1) forwards,
+             bd-center-breathe 4.2s ease-in-out 3.5s infinite;
+}
+
+@keyframes bd-center-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.025); }
+}
+
+/* ─── Chapter 03: Asynchronous Polaroid Idle Movements ─── */
+/* Polaroid 01: subtle rotate shift (7.2s) */
+.bd-polaroid--idle-1 {
+  animation: bd-polaroid-sway-1 7.2s ease-in-out 1.2s infinite;
+}
+
+/* Polaroid 02: subtle rotate shift (8.4s) */
+.bd-polaroid--idle-2 {
+  animation: bd-polaroid-sway-2 8.4s ease-in-out 1.5s infinite;
+}
+
+/* Polaroid 03: subtle vertical float (6.8s) */
+.bd-polaroid--idle-3 {
+  animation: bd-polaroid-float-3 6.8s ease-in-out 1.3s infinite;
+}
+
+/* Polaroid 04: subtle rotate shift (9.1s) */
+.bd-polaroid--idle-4 {
+  animation: bd-polaroid-sway-4 9.1s ease-in-out 1.7s infinite;
+}
+
+/* Polaroid 05: subtle rotate shift (7.8s) */
+.bd-polaroid--idle-5 {
+  animation: bd-polaroid-sway-5 7.8s ease-in-out 1.4s infinite;
+}
+
+@keyframes bd-polaroid-sway-1 {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(0.55deg) translateY(-2px); }
+}
+
+@keyframes bd-polaroid-sway-2 {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-0.5deg) translateY(-1px); }
+}
+
+@keyframes bd-polaroid-float-3 {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3.5px) rotate(0.25deg); }
+}
+
+@keyframes bd-polaroid-sway-4 {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-0.65deg) translateY(-2px); }
+}
+
+@keyframes bd-polaroid-sway-5 {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(0.5deg) translateY(-1px); }
+}
+
+.bd-polaroid__clip--tilt {
+  animation: bd-clip-tilt 6.5s ease-in-out infinite;
+}
+
+@keyframes bd-clip-tilt {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-1.5deg); }
+}
+
+.bd-polaroid__tape--breathe {
+  animation: bd-tape-breathe 5.2s ease-in-out infinite;
+}
+
+@keyframes bd-tape-breathe {
+  0%, 100% { opacity: 0.72; }
+  50% { opacity: 0.92; }
+}
+
+.bd-polaroid__stamp--breathe {
+  display: inline-block;
+  animation: bd-sparkle-pulse 3.5s ease-in-out infinite;
+}
+
+/* ─── Chapter 04: Letter Paper Ambient Shift ─── */
+.bd-message--letter-page {
+  min-height: calc(100svh - 60px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(3rem, 6vw, 5rem) 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.bd-letter-sheet {
+  background: #FAF8F4;
+  border: 1px solid rgba(23, 21, 21, 0.06);
+  border-radius: 4px;
+  max-width: 640px;
+  width: 100%;
+  padding: clamp(2.5rem, 6vw, 4.5rem) clamp(2rem, 5vw, 3.5rem);
+  box-shadow:
+    0 4px 12px rgba(23, 21, 21, 0.03),
+    0 16px 40px rgba(23, 21, 21, 0.06),
+    0 32px 64px rgba(23, 21, 21, 0.04);
+  position: relative;
+  z-index: 10;
+  transition: transform 0.5s ease;
+}
+
+.bd-letter-sheet--idle {
+  animation: bd-paper-shift 10s ease-in-out infinite;
+}
+
+@keyframes bd-paper-shift {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  50% { transform: rotate(0.18deg) translateY(-2px); }
+}
+
+.bd-letter-seal {
+  position: absolute;
+  top: -16px;
+  right: 28px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bd-accent);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 12px rgba(217, 140, 155, 0.4);
+  animation: bd-sparkle-pulse 4s ease-in-out infinite;
+}
+
+.bd-sig-line--breathe {
+  animation: bd-sig-glow 4s ease-in-out infinite;
+}
+
+@keyframes bd-sig-glow {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.85; }
+}
+
+/* ─── Chapter 05: Physical Gift Box Breathing & Ribbon Flutter ─── */
+.bd-gift-physical--closed .bd-gift-svg {
+  animation: bd-box-breathe 4s ease-in-out infinite;
+}
+
+@keyframes bd-box-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.018); }
+}
+
+.bd-gift-physical--closed .bd-gift-bow {
+  animation: bd-bow-flutter 3.5s ease-in-out infinite;
+}
+
+@keyframes bd-bow-flutter {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(1.2deg); }
+}
+
+.bd-gift-physical--closed .bd-gift-shadow {
+  animation: bd-shadow-breathe 4s ease-in-out infinite;
+}
+
+@keyframes bd-shadow-breathe {
+  0%, 100% { opacity: 0.08; transform: scale(1); }
+  50% { opacity: 0.14; transform: scale(1.03); }
+}
+
+/* ─── Chapter 06: Final Background Breathing ─── */
+.bd-final-cinematic__bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, #262121 0%, #171515 100%);
+  z-index: 1;
+  animation: bd-final-bg-breathe 12s ease-in-out infinite;
+}
+
+@keyframes bd-final-bg-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.95; }
+  50% { transform: scale(1.04); opacity: 1; }
+}
+
+/* ─── Stepper Active Breathing Pulse ─── */
+.bd-step-node--active .bd-step-dot {
+  background: var(--bd-accent);
+  box-shadow: 0 0 10px rgba(217, 140, 155, 0.7);
+  animation: bd-step-pulse 2.8s ease-in-out infinite;
+}
+
+@keyframes bd-step-pulse {
+  0%, 100% { transform: scale(1.25); box-shadow: 0 0 8px rgba(217, 140, 155, 0.6); }
+  50% { transform: scale(1.45); box-shadow: 0 0 14px rgba(217, 140, 155, 0.9); }
+}
+
+/* ─── Reduced Motion Overrides ─── */
+@media (prefers-reduced-motion: reduce) {
+  .bd-ambient-light,
+  .bd-intro-headline--breathe,
+  .bd-intro-open-btn--breathe,
+  .bd-corner--breathe,
+  .bd-hero__title--breathe,
+  .bd-hero__name--breathe,
+  .bd-polaroid--idle-1,
+  .bd-polaroid--idle-2,
+  .bd-polaroid--idle-3,
+  .bd-polaroid--idle-4,
+  .bd-polaroid--idle-5,
+  .bd-polaroid__clip--tilt,
+  .bd-polaroid__tape--breathe,
+  .bd-letter-sheet--idle,
+  .bd-sig-line--breathe,
+  .bd-gift-physical--closed .bd-gift-svg,
+  .bd-gift-physical--closed .bd-gift-bow,
+  .bd-gift-physical--closed .bd-gift-shadow,
+  .bd-final-cinematic__bg,
+  .bd-step-node--active .bd-step-dot {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+
+
