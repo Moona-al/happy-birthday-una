@@ -22,8 +22,8 @@ export default function MessagePage() {
         prevHref="/memories"
         prevLabel="← Back to memories"
         nextHref="/gift"
-        nextLabel="A little gift"
-        transitionHint="But that's not all... I got you something."
+        nextLabel="The little light"
+        transitionHint="When the room goes quiet..."
       />
     </PageTransition>
   );

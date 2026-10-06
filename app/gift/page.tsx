@@ -1,12 +1,12 @@
 'use client';
 
 import React from 'react';
-import CosmicChapter from '@/components/birthday/CosmicChapter';
+import LittleLight from '@/components/birthday/LittleLight';
 
 export default function GiftPage() {
   return (
-    <main className="bd-chapter-cosmic-page">
-      <CosmicChapter />
+    <main className="bd-chapter-light-page">
+      <LittleLight />
     </main>
   );
 }

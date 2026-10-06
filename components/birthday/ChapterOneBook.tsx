@@ -42,29 +42,29 @@ export default function ChapterOneBook() {
       return;
     }
 
-    // SEQUENCE TIMING:
-    // STEP 01: Ambient (0ms - 400ms)
-    // STEP 02: Book Appears (400ms - 900ms)
+    // SEQUENCE TIMING (Calm, cinematic, elegant storybook opening):
+    // STEP 01: Ambient background & dust particles settle (0 - 600ms)
+    // STEP 02: Closed book gently appears and rests on table (600ms)
     addTimeout(() => {
       setPhase('appear');
-    }, 400);
+    }, 600);
 
-    // STEP 03: Cover Opens (1000ms - 2100ms)
+    // STEP 03: Cover begins slowly, gracefully peeling open (2200ms)
     addTimeout(() => {
       setPhase('opening');
-    }, 1100);
+    }, 2200);
 
-    // STEP 04: Book fully settled & opens completely
+    // STEP 04: Book settles completely flat and open (4800ms)
     addTimeout(() => {
       setPhase('open');
-    }, 2250);
+    }, 4800);
 
-    // STEP 05 & 06: Editorial Text Reveal Sequence
-    addTimeout(() => setTextStep(1), 2450); // "CHAPTER"
-    addTimeout(() => setTextStep(2), 2650); // "01"
-    addTimeout(() => setTextStep(3), 2900); // Divider & Botanical motif
-    addTimeout(() => setTextStep(4), 3150); // "THE BEGINNING"
-    addTimeout(() => setTextStep(5), 3450); // Story description & "Turn the page"
+    // STEP 05 & 06: Editorial Text & Motif Reveal Sequence (Paced, meditative fade-ins)
+    addTimeout(() => setTextStep(1), 5200); // "CHAPTER"
+    addTimeout(() => setTextStep(2), 5800); // "01" numeral
+    addTimeout(() => setTextStep(3), 6500); // Divider & Botanical motif
+    addTimeout(() => setTextStep(4), 7300); // "THE BEGINNING"
+    addTimeout(() => setTextStep(5), 8200); // Story description & "Turn the page"
   }, [addTimeout]);
 
   // Subtle mouse parallax tilt when open
